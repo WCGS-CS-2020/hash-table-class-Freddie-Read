@@ -1,0 +1,107 @@
+class Hash_Table
+    {
+        public string[,] table = new string[53, 53];
+        private int size = 53;
+
+        public void addData(string item)
+        {
+            Encrypt e = new Encrypt();
+            item = e.hideData(item);
+
+            int index = getPosition(item);
+            checkFree(index, item);
+        }
+
+        private int getPosition(string item)
+        {
+            byte[] asciiBytes = Encoding.ASCII.GetBytes(item);
+            int index = 0;
+            foreach (var items in asciiBytes)
+            {
+                index += items;
+            }
+
+            index = ((index + 207) * 4512 % size);
+
+            return index;
+        }
+
+        private void checkFree(int pos, string item)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                if (table[pos, i] == "")
+                {
+                    table[pos, i] = item;
+                    break;
+                }
+            }
+        }
+
+        public string deleteItem(string item)
+        {            
+            if (searchItem(item) == "Stored")
+            {
+                Encrypt e = new Encrypt();
+                item = e.hideData(item);
+
+                int row = getPosition(item);
+
+                for (int i = 0; i < size; i++)
+                {
+                    if (item == table[row, i])
+                    {
+                        table[row, i] = "";
+                        break;
+                    }
+                }
+
+                return "Deleted";
+            }
+            else
+            {
+                return "Not Stored";
+            }
+        }
+        
+        public string searchItem(string item)
+        {
+            Encrypt e = new Encrypt();
+            item = e.hideData(item);
+
+            int index = getPosition(item);
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    if (table[i, j] == item)
+                    {
+                        return "Stored";
+                    }
+                }
+            }
+
+            return "Not stored";
+        }
+
+        public void displayTable()
+        {
+            bool flick = false;
+            for (int i = 0; i < size; i++)
+            {
+                flick = false;
+                for (int j = 0; j < size; j++)
+                {
+                    if (table[i, j] != "")
+                    {
+                        Console.Write("{0} ", table[i, j]);
+                        flick = true;
+                    }
+                }
+                if (flick == true)
+                {
+                    Console.WriteLine();
+                }
+            }
+        }
+    }
